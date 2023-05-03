@@ -6,15 +6,15 @@ module.exports = (sequelize, DataTypes) => {
     name: {
       type: DataTypes.STRING
     },
-    image: {
+    image_url: {
       type: DataTypes.STRING
     },
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    createdAt: { type: DataTypes.DATE, field: 'created_at' },
+    updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
   }, {
     defaultScope: {
       attributes: { 
-        exclude: ['created_at','updated_at'] 
+        exclude: ['createdAt','updatedAt'] 
       },
     },
 
