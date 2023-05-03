@@ -1,10 +1,19 @@
 const express = require('express');
+const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(express.static('public'))
+app.use(
+  fileUpload({
+      limits: {
+          fileSize: 10000000, // Around 10MB
+      },
+      abortOnLimit: true,
+  })
+);
 
 const route = require('./app/routes/route');
 app.use('/', route);

@@ -1,8 +1,7 @@
-const fs = require('fs');
-
 const db = require("../models");
 const Product = db['product'];
 const ProductImage = db['product_image'];
+const imageService = require('../services/image.js');
 const Op = db.Sequelize.Op;
 
 module.exports = {
@@ -118,7 +117,17 @@ module.exports = {
 
   async findOne(req, res) {
     try {
-      const product = await Product.findByPk(req.params.id);
+      const product = await Product.findByPk(req.params.id, {
+        include: [{
+          model: db['category']
+        },
+        {
+          model: db['brand']
+        },
+        {
+          model: db['product_image']
+        }]
+      });
       res.status(200).send(product);
     } catch (err) {
       res.status(500).send({
@@ -159,11 +168,7 @@ module.exports = {
         }
       });
       productImages.forEach(async (productImage) => {
-        fs.unlink("../../public/images/"+productImage.image_url, (err) => {
-          if (err) {
-              throw err;
-          }
-        });
+        await imageService.deleteImage("../../public/images/"+productImage.image_url);
         await productImage.destroy();
       });
 

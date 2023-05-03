@@ -1,9 +1,9 @@
-const catalog = require('./catalog.js')
-const dashboard = require('./dashboard.js')
 const product = require('./product.js')
+const category = require('./category.js')
+const brand = require('./brand.js')
 
 module.exports = {
-  catalog,
-  dashboard,
-  product
+  product,
+  category,
+  brand
 };
