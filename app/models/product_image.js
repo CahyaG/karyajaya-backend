@@ -1,11 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const Brand = sequelize.define("brand", {
-    brand_code: {
-      type: DataTypes.STRING
-    },
-    name: {
-      type: DataTypes.STRING
-    },
+  const ProductImage = sequelize.define("product_image", {
     image_url: {
       type: DataTypes.STRING
     },
@@ -20,9 +14,9 @@ module.exports = (sequelize, DataTypes) => {
 
   });
 
-  Brand.associate = function(models) {
-    this.hasMany(models.product, {foreignKey: 'brand_id'});
+  ProductImage.associate = function(models) {
+    this.belongsTo(models.product,{foreignKey: 'product_id'});
   };
 
-  return Brand;
+  return ProductImage;
 };
