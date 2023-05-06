@@ -1,5 +1,6 @@
 const router = require('express').Router();
-const { product, category, brand } = require('../controllers');
+const { product, category, brand, user, refreshToken } = require('../controllers');
+const verifyToken = require("../middlewares/verifyToken.js");
 
 // PRODUCT ROIUTES
 router.get('/products', product.findAll);
@@ -28,5 +29,11 @@ router.post('/brands', brand.create);
 router.delete('/brands/:id', brand.delete);
 // need auth user or admin
 router.put('/brands/:id', brand.update);
+
+// AUTH ROUTES
+router.post('/login', user.login);
+router.post('/register', user.register);
+router.delete('/logout', user.logout);
+router.get('/token', refreshToken.refreshToken);
 
 module.exports = router;
