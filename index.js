@@ -3,6 +3,15 @@ const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
 const app = express();
 
+const db = require("./app/models");
+db.sequelize.sync()
+  .then(() => {
+    console.log("Synced db.");
+  })
+  .catch((err) => {
+    console.log("Failed to sync db: " + err.message);
+  });
+
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(express.static('public'))
@@ -17,15 +26,6 @@ app.use(
 
 const route = require('./app/routes/route');
 app.use('/', route);
-
-const db = require("./app/models");
-db.sequelize.sync()
-  .then(() => {
-    console.log("Synced db.");
-  })
-  .catch((err) => {
-    console.log("Failed to sync db: " + err.message);
-  });
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, ()=>{

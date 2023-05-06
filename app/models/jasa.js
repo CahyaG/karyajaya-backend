@@ -1,15 +1,18 @@
 module.exports = (sequelize, DataTypes) => {
-  const Category = sequelize.define("category", {
-    category_code: {
-      type: DataTypes.STRING
-    },
+  const Brand = sequelize.define("jasa", {
     name: {
       type: DataTypes.STRING
     },
-    image_url: {
+    jasa_code: {
+      type: DataTypes.STRING
+    },
+    cover: {
       type: DataTypes.STRING,
       allowNull: true,
       defaultValue: null
+    },
+    description: {
+      type: DataTypes.TEXT
     },
     createdAt: { type: DataTypes.DATE, field: 'created_at' },
     updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
@@ -22,9 +25,5 @@ module.exports = (sequelize, DataTypes) => {
 
   });
 
-  Category.associate = function(models) {
-    this.hasMany(models.product, {foreignKey: 'category_id'});
-  };  
-
-  return Category;
+  return Brand;
 };

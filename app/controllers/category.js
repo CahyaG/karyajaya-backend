@@ -42,9 +42,9 @@ module.exports = {
   async create(req, res) {
     try {
       const data = await Category.create(req.body);
-      const { image } = req.files;
-      let image_url = "category-images/" + data.id + path.extname(image.name);
-      await imageService.uploadImage("../../public/"+image_url, req.files);
+      const { image_url } = req.files;
+      let url = "category-images/" + data.id + path.extname(image_url.name);
+      await imageService.uploadImage("../../public/"+url, req.files);
       await data.update({ image_url: image_url });
       res.json(data);
     } catch (error) {
@@ -60,8 +60,8 @@ module.exports = {
         where: { id: req.params.id }
       });
 
-      const { image } = req.files;
-      if(image){
+      const { image_url } = req.files;
+      if(image_url){
         await imageService.uploadImage("../../public/"+data.image_url, req.files);
       }
 
