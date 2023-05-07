@@ -22,17 +22,18 @@ module.exports = (sequelize, DataTypes) => {
     updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
   }, {
     defaultScope: {
-      attributes: { 
-        exclude: ['createdAt','updatedAt'] 
+      attributes: {
+        exclude: ['createdAt', 'updatedAt']
       },
     },
 
   });
 
-  Product.associate = function(models) {
-    this.belongsTo(models.category,{foreignKey: 'category_id'});
-    this.belongsTo(models.brand,{foreignKey: 'brand_id'});
-    this.hasMany(models.product_image, {foreignKey: 'product_id'});
+  Product.associate = function (models) {
+    this.belongsTo(models.category, { foreignKey: 'category_id' });
+    this.belongsTo(models.brand, { foreignKey: 'brand_id' });
+    this.hasMany(models.product_image, { foreignKey: 'product_id' });
+    this.hasMany(models.peminjaman, { foreignKey: 'product_id' });
   };
 
   return Product;
