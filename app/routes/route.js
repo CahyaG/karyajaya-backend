@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const { product, category, brand, user, refreshToken, penjualan } = require('../controllers');
-const { verifyToken } = require("../middlewares/verifyToken.js");
+const { product, category, brand, user, refreshToken, peminjaman, penjualan } = require('../controllers');
+const verifyToken = require("../middlewares/verifyToken.js");
 
 // PRODUCT ROIUTES
 router.get('/products', product.findAll);
@@ -45,5 +45,13 @@ router.post('/login', user.login);
 router.post('/register', user.register);
 router.delete('/logout', user.logout);
 router.get('/token', refreshToken.refreshToken);
+
+// PEMINJAMAN ROUTES (need auth)
+router.get('/peminjaman', peminjaman.findAll);
+router.get('/peminjaman/:id', peminjaman.findOne);
+router.post('/peminjaman', peminjaman.create);
+router.delete('/peminjaman/:id', peminjaman.delete);
+router.put('/peminjaman/:id', peminjaman.update);
+
 
 module.exports = router;

@@ -25,8 +25,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     paranoid: true,
     defaultScope: {
-      attributes: { 
-        exclude: ['createdAt','updatedAt'] 
+      attributes: {
+        exclude: ['createdAt', 'updatedAt']
       },
     },
 
@@ -38,6 +38,7 @@ module.exports = (sequelize, DataTypes) => {
     this.hasMany(models.product_image, {foreignKey: 'product_id'});
     this.hasMany(models.detail_penjualan, {foreignKey: 'product_id'});
     this.belongsToMany(models.penjualan, { through: models.detail_penjualan, foreignKey: 'product_id' });
+    this.hasMany(models.peminjaman, { foreignKey: 'product_id' });
   };
 
   return Product;
