@@ -28,5 +28,5 @@ module.exports = (sequelize, DataTypes) => {
     this.belongsToMany(models.product, { through: models.detail_penjualan, foreignKey: 'penjualan_id' });
   };
 
-  return Brand;
+  return Penjualan;
 };

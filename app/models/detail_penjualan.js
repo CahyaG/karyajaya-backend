@@ -13,10 +13,10 @@ module.exports = (sequelize, DataTypes) => {
 
   });
 
-  Brand.associate = function (models) {
+  DetailPenjualan.associate = function (models) {
     this.BelongsTo(models.product, { foreignKey: 'product_id' });
     this.BelongsTo(models.penjualan, { foreignKey: 'penjualan_id' });
   };
 
-  return Brand;
+  return DetailPenjualan;
 };
