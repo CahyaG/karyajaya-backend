@@ -1,20 +1,10 @@
 module.exports = (sequelize, DataTypes) => {
-  const Brand = sequelize.define("brand", {
-    brand_code: {
-      type: DataTypes.STRING
-    },
-    name: {
-      type: DataTypes.STRING
-    },
-    image_url: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      defaultValue: null
-    },
+  const DetailPenjualan = sequelize.define("detail_penjualan", {
     createdAt: { type: DataTypes.DATE, field: 'created_at' },
     updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
   }, {
     paranoid: true,
+    tableName: 'detail_penjualan',
     defaultScope: {
       attributes: {
         exclude: ['createdAt', 'updatedAt']
@@ -24,7 +14,8 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Brand.associate = function (models) {
-    this.hasMany(models.product, { foreignKey: 'brand_id' });
+    this.BelongsTo(models.product, { foreignKey: 'product_id' });
+    this.BelongsTo(models.penjualan, { foreignKey: 'penjualan_id' });
   };
 
   return Brand;

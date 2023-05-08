@@ -1,31 +1,31 @@
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define("user", {
+  const Brand = sequelize.define("jasa", {
     name: {
       type: DataTypes.STRING
     },
-    username: {
+    jasa_code: {
       type: DataTypes.STRING
     },
-    email: {
-      type: DataTypes.STRING
+    cover: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null
     },
-    password: {
-      type: DataTypes.STRING
-    },
-    refresh_token: {
-      type: DataTypes.STRING
+    description: {
+      type: DataTypes.TEXT
     },
     createdAt: { type: DataTypes.DATE, field: 'created_at' },
     updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
   }, {
     paranoid: true,
+    tableName: 'jasa',
     defaultScope: {
-      attributes: {
-        exclude: ['createdAt', 'updatedAt']
+      attributes: { 
+        exclude: ['createdAt','updatedAt'] 
       },
     },
 
   });
 
-  return User;
+  return Brand;
 };

@@ -9,7 +9,9 @@ module.exports = {
   product,
   category,
   brand,
+  jasa,
   user,
+  penjualan,
   refreshToken,
   peminjaman
 };

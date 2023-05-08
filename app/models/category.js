@@ -7,11 +7,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING
     },
     image_url: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null
     },
     createdAt: { type: DataTypes.DATE, field: 'created_at' },
     updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
   }, {
+    paranoid: true,
     defaultScope: {
       attributes: { 
         exclude: ['createdAt','updatedAt'] 

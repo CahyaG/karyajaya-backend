@@ -138,8 +138,21 @@ module.exports = {
 
   async create(req, res) {
     try {
-      const product = await Product.create(req.body);
-      res.status(200).send(product);
+      const data = await Product.create(req.body);
+      const { cover, product_images } = req.files;
+      let image_url = "product-images/" + data.id + path.extname(cover.name);
+      await imageService.uploadImage("../../public/"+image_url, req.files);
+      await data.update({ cover: image_url });
+
+      if(product_images){
+        product_images.forEach(async (product_image) => {
+          const productImage = await ProductImage.create({ product_id: data.id});
+          let image_url = "product-images/" + productImage.id + path.extname(product_image.name);
+          await imageService.uploadImage("../../public/"+image_url, req.files);
+          await productImage.update({ image_url: image_url });
+        });
+      }
+      res.status(200).send(data);
     } catch (err) {
       res.status(500).send({
         message: err.message || "Some error occurred while retrieving products."
@@ -150,9 +163,12 @@ module.exports = {
   async update(req, res) { 
     try {
       const product = await Product.findByPk(req.params.id);
-      const updatedProduct = await product.update(req.body);
+      const { cover, product_images } = req.files;
+      let image_url = "jasa-images/" + data.id + path.extname(cover.name);
+      await imageService.uploadImage("../../public/"+image_url, req.files);
+      const updatedProduct = await product.update({ ...req.body, cover: image_url });
       res.status(200).send(updatedProduct);
-    } catch (err) {
+    } catch (err) {s
       res.status(500).send({
         message: err.message || "Some error occurred while retrieving products."
       });
@@ -161,6 +177,7 @@ module.exports = {
 
   async delete(req, res) {
     try {
+      const force = req.query.force;
       const product = await Product.findByPk(req.params.id);
       const productImages = await ProductImage.findAll({
         where: {
@@ -168,12 +185,43 @@ module.exports = {
         }
       });
       productImages.forEach(async (productImage) => {
-        await imageService.deleteImage("../../public/images/"+productImage.image_url);
-        await productImage.destroy();
+        if(force)
+          await imageService.deleteImage("../../public/images/"+productImage.image_url);
+        await productImage.destroy({force});
       });
 
-      const deletedProduct = await product.destroy();
+      const deletedProduct = await product.destroy({force});
       res.status(200).send(deletedProduct);
+    } catch (err) {
+      res.status(500).send({
+        message: err.message || "Some error occurred while retrieving products."
+      });
+    }
+  },
+
+  async deleteImage(req, res) {
+    try {
+      const force = req.query.force;
+      const productImage = await ProductImage.findByPk(req.params.id);
+      if(force)
+        await imageService.deleteImage("../../public/images/"+productImage.image_url);
+      const deletedProductImage = await productImage.destroy({force});
+      res.status(200).send(deletedProductImage);
+    } catch (err) {
+      res.status(500).send({
+        message: err.message || "Some error occurred while retrieving products."
+      });
+    }
+  },
+
+  async createImage(req, res) {
+    try {
+      const data = await ProductImage.create(req.body);
+      const { image } = req.files;
+      let image_url = "jasa-images/" + data.id + path.extname(image.name);
+      await imageService.uploadImage("../../public/"+image_url, req.files);
+      await data.update({ image_url });
+      res.status(200).send(data);
     } catch (err) {
       res.status(500).send({
         message: err.message || "Some error occurred while retrieving products."

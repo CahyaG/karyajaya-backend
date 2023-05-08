@@ -1,7 +1,6 @@
 const db = require("../models");
-const Category = db['category'];
+const Jasa = db['jasa'];
 const imageService = require('../services/image.js');
-const path = require('path')
 const Op = db.Sequelize.Op;
 
 module.exports = {
@@ -18,7 +17,7 @@ module.exports = {
       let currentPage = req.params.page ? Number(req.params.page) : 1
       let perPage = req.query.perPage ? Number(req.query.perPage) : 10
 
-      const data = await Category.findAndCountAll({
+      const data = await Product.findAndCountAll({
         where: where,
         limit: perPage,
         offset: (currentPage - 1)*perPage,
@@ -26,10 +25,10 @@ module.exports = {
 
       let total = data.count;
       let lastPage = Math.ceil(total / perPage)
-      let prevPage = (currentPage != 1) ? req.headers.host + '/category/page/' + (currentPage-1) : undefined;
-      let nextPage = (currentPage != lastPage) ? req.headers.host + '/category/page/' + (currentPage+1) : undefined;
+      let prevPage = (currentPage != 1) ? req.headers.host + '/jasa/page/' + (currentPage-1) : undefined;
+      let nextPage = (currentPage != lastPage) ? req.headers.host + '/jasa/page/' + (currentPage+1) : undefined;
 
-      let category = {
+      let jasa = {
         content: data.rows,
         pagginate:{
             total,
@@ -41,10 +40,10 @@ module.exports = {
         }
       }
 
-      res.json(category);
+      res.json(jasa);
     } catch (error) {
       res.status(500).send({
-        message: error.message || "Some error occurred while retrieving categories."
+        message: error.message || "Some error occurred while retrieving jasas."
       });
     }
   },
@@ -59,60 +58,65 @@ module.exports = {
         }
       }
 
-      const data = await Category.findAll({
+      const data = await Jasa.findAll({
         where: where
       });
 
       res.json(data);
     } catch (error) {
       res.status(500).send({
-        message: error.message || "Some error occurred while retrieving categories."
+        message: error.message || "Some error occurred while retrieving jasas."
       });
     }
   },
 
   async findOne(req, res) {
     try {
-      const data = await Category.findByPk(req.params.id);
+      const data = await Jasa.findOne({
+        where: {
+          id: req.params.id
+        }
+      });
 
       res.json(data);
     } catch (error) {
       res.status(500).send({
-        message: error.message || "Some error occurred while retrieving categories."
+        message: error.message || "Some error occurred while retrieving jasas."
       });
     }
   },
 
   async create(req, res) {
     try {
-      const data = await Category.create(req.body);
-      const { image_url } = req.files;
-      let url = "category-images/" + data.id + path.extname(image_url.name);
-      await imageService.uploadImage("../../public/"+url, req.files);
-      await data.update({ image_url: image_url });
+      const data = await Jasa.create(req.body);
+      
+      const { cover } = req.files;
+      let image_url = "jasa-images/" + data.id + path.extname(cover.name);
+      await imageService.uploadImage("../../public/"+image_url, req.files);
+      await data.update({ cover: image_url });
       res.json(data);
     } catch (error) {
       res.status(500).send({
-        message: error.message || "Some error occurred while creating the Category."
+        message: error.message || "Some error occurred while creating the jasa."
       });
     }
   },
 
   async update(req, res) {
     try {
-      const data = await Category.update(req.body, {
+      const data = await Jasa.update(req.body, {
         where: { id: req.params.id }
       });
 
-      const { image_url } = req.files;
-      if(image_url){
-        await imageService.uploadImage("../../public/"+data.image_url, req.files);
+      const { cover } = req.files;
+      if(cover){
+        await imageService.uploadImage("../../public/"+data.cover, req.files);
       }
 
       res.json(data);
     } catch (error) {
       res.status(500).send({
-        message: error.message || "Some error occurred while updating the Category."
+        message: error.message || "Some error occurred while updating the jasa."
       });
     }
   },
@@ -120,14 +124,18 @@ module.exports = {
   async delete(req, res) {
     try {
       const force = req.query.force;
-      const data = await Category.findByPk(req.params.id);
-      if(force)
-        await imageService.deleteImage("../../public/"+data.image_url);
-      const deletedCategory = await data.destroy({force});
-      res.status(200).send(deletedCategory);
+      const data = await Jasa.destroy({
+        where: { id: req.params.id },
+        force
+      });
+      if(force){
+        await imageService.deleteImage("../../public/"+data.cover);
+      }
+
+      res.json(deletedJasa);
     } catch (error) {
       res.status(500).send({
-        message: error.message || "Some error occurred while deleting the Category."
+        message: error.message || "Some error occurred while deleting the jasa."
       });
     }
   }
