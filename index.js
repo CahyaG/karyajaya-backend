@@ -6,14 +6,14 @@ const dotenv = require("dotenv");
 dotenv.config();
 const app = express();
 
-const db = require("./app/models");
-db.sequelize.sync()
-  .then(() => {
-    console.log("Synced db.");
-  })
-  .catch((err) => {
-    console.log("Failed to sync db: " + err.message);
-  });
+// const db = require("./app/models");
+// db.sequelize.sync()
+//   .then(() => {
+//     console.log("Synced db.");
+//   })
+//   .catch((err) => {
+//     console.log("Failed to sync db: " + err.message);
+//   });
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
