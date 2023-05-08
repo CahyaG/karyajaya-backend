@@ -1,15 +1,19 @@
 module.exports = (sequelize, DataTypes) => {
-  const Brand = sequelize.define("brand", {
-    brand_code: {
-      type: DataTypes.STRING
-    },
+  const User = sequelize.define("user", {
     name: {
       type: DataTypes.STRING
     },
-    image_url: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      defaultValue: null
+    username: {
+      type: DataTypes.STRING
+    },
+    email: {
+      type: DataTypes.STRING
+    },
+    password: {
+      type: DataTypes.STRING
+    },
+    refresh_token: {
+      type: DataTypes.STRING
     },
     createdAt: { type: DataTypes.DATE, field: 'created_at' },
     updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
@@ -23,9 +27,5 @@ module.exports = (sequelize, DataTypes) => {
 
   });
 
-  Brand.associate = function (models) {
-    this.hasMany(models.product, { foreignKey: 'brand_id' });
-  };
-
-  return Brand;
+  return User;
 };

@@ -123,11 +123,14 @@ module.exports = {
 
   async delete(req, res) {
     try {
+      const force = req.query.force;
       const data = await Jasa.destroy({
-        where: { id: req.params.id }
+        where: { id: req.params.id },
+        force
       });
-      await imageService.deleteImage("../../public/"+data.cover);
-      const deletedJasa = await data.destroy();
+      if(force){
+        await imageService.deleteImage("../../public/"+data.cover);
+      }
 
       res.json(deletedJasa);
     } catch (error) {

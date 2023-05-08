@@ -140,14 +140,14 @@ module.exports = {
     try {
       const data = await Product.create(req.body);
       const { cover, product_images } = req.files;
-      let image_url = "jasa-images/" + data.id + path.extname(cover.name);
+      let image_url = "product-images/" + data.id + path.extname(cover.name);
       await imageService.uploadImage("../../public/"+image_url, req.files);
       await data.update({ cover: image_url });
 
       if(product_images){
         product_images.forEach(async (product_image) => {
           const productImage = await ProductImage.create({ product_id: data.id});
-          let image_url = "jasa-images/" + productImage.id + path.extname(product_image.name);
+          let image_url = "product-images/" + productImage.id + path.extname(product_image.name);
           await imageService.uploadImage("../../public/"+image_url, req.files);
           await productImage.update({ image_url: image_url });
         });
@@ -177,6 +177,7 @@ module.exports = {
 
   async delete(req, res) {
     try {
+      const force = req.query.force;
       const product = await Product.findByPk(req.params.id);
       const productImages = await ProductImage.findAll({
         where: {
@@ -184,11 +185,12 @@ module.exports = {
         }
       });
       productImages.forEach(async (productImage) => {
-        await imageService.deleteImage("../../public/images/"+productImage.image_url);
-        await productImage.destroy();
+        if(force)
+          await imageService.deleteImage("../../public/images/"+productImage.image_url);
+        await productImage.destroy({force});
       });
 
-      const deletedProduct = await product.destroy();
+      const deletedProduct = await product.destroy({force});
       res.status(200).send(deletedProduct);
     } catch (err) {
       res.status(500).send({
@@ -199,9 +201,11 @@ module.exports = {
 
   async deleteImage(req, res) {
     try {
+      const force = req.query.force;
       const productImage = await ProductImage.findByPk(req.params.id);
-      await imageService.deleteImage("../../public/images/"+productImage.image_url);
-      const deletedProductImage = await productImage.destroy();
+      if(force)
+        await imageService.deleteImage("../../public/images/"+productImage.image_url);
+      const deletedProductImage = await productImage.destroy({force});
       res.status(200).send(deletedProductImage);
     } catch (err) {
       res.status(500).send({

@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     createdAt: { type: DataTypes.DATE, field: 'created_at' },
     updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
   }, {
+    paranoid: true,
     defaultScope: {
       attributes: { 
         exclude: ['createdAt','updatedAt'] 
