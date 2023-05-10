@@ -32,13 +32,14 @@ module.exports = (sequelize, DataTypes) => {
 
   });
 
-  Product.associate = function(models) {
-    this.belongsTo(models.category,{foreignKey: 'category_id'});
-    this.belongsTo(models.brand,{foreignKey: 'brand_id'});
-    this.hasMany(models.product_image, {foreignKey: 'product_id'});
-    this.hasMany(models.detail_penjualan, {foreignKey: 'product_id'});
-    this.belongsToMany(models.penjualan, { through: models.detail_penjualan, foreignKey: 'product_id' });
-    this.hasMany(models.peminjaman, { foreignKey: 'product_id' });
+  Product.associate = function (models) {
+    this.belongsTo(models.category, { foreignKey: 'category_id' });
+    this.belongsTo(models.brand, { foreignKey: 'brand_id' });
+    this.hasMany(models.product_image, { foreignKey: 'product_id' });
+    // this.hasMany(models.detail_penjualan, {foreignKey: 'product_id'});
+    // this.belongsToMany(models.penjualan, { through: models.detail_penjualan, foreignKey: 'product_id' });
+    // this.hasMany(models.detail_peminjaman, {foreignKey: 'product_id'});
+    // this.belongsToMany(models.peminjaman, { through: models.detail_peminjaman, foreignKey: 'product_id' });
   };
 
   return Product;

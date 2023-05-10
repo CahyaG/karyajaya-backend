@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Penjualan.associate = function (models) {
     this.hasMany(models.detail_penjualan, { foreignKey: 'penjualan_id' });
-    this.belongsToMany(models.product, { through: models.detail_penjualan, foreignKey: 'penjualan_id' });
+    // this.belongsToMany(models.product, { through: models.detail_penjualan, foreignKey: 'penjualan_id' });
   };
 
   return Penjualan;
