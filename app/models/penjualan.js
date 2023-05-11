@@ -1,5 +1,10 @@
 module.exports = (sequelize, DataTypes) => {
   const Penjualan = sequelize.define("penjualan", {
+    id: {
+      type: DataTypes.BIGINT,
+      primaryKey: true,
+      autoIncrement: true
+    },
     kode_penjualan: {
       type: DataTypes.STRING
     },
@@ -12,12 +17,13 @@ module.exports = (sequelize, DataTypes) => {
     },
     createdAt: { type: DataTypes.DATE, field: 'created_at' },
     updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
+    deletedAt: { type: DataTypes.DATE, field: 'deleted_at' },
   }, {
     paranoid: true,
     tableName: 'penjualan',
     defaultScope: {
       attributes: {
-        exclude: ['createdAt', 'updatedAt']
+        exclude: ['createdAt', 'updatedAt', 'deletedAt']
       },
     },
 

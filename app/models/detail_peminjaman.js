@@ -1,26 +1,22 @@
 module.exports = (sequelize, DataTypes) => {
-  const Brand = sequelize.define("brand", {
+  const DetailPeminjaman = sequelize.define("detail_peminjaman", {
     id: {
       type: DataTypes.BIGINT,
       primaryKey: true,
       autoIncrement: true
     },
-    brand_code: {
-      type: DataTypes.STRING
+    product_id: {
+      type: DataTypes.BIGINT
     },
-    name: {
-      type: DataTypes.STRING
-    },
-    image_url: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      defaultValue: null
+    peminjaman_id: {
+      type: DataTypes.BIGINT
     },
     createdAt: { type: DataTypes.DATE, field: 'created_at' },
     updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
     deletedAt: { type: DataTypes.DATE, field: 'deleted_at' },
   }, {
     paranoid: true,
+    tableName: 'detail_peminjaman',
     defaultScope: {
       attributes: {
         exclude: ['createdAt', 'updatedAt', 'deletedAt']
@@ -29,9 +25,10 @@ module.exports = (sequelize, DataTypes) => {
 
   });
 
-  Brand.associate = function (models) {
-    this.hasMany(models.product, { foreignKey: 'brand_id' });
+  DetailPeminjaman.associate = function (models) {
+    this.belongsTo(models.product, { foreignKey: 'product_id' });
+    this.belongsTo(models.peminjaman, { foreignKey: 'peminjaman_id' });
   };
 
-  return Brand;
+  return DetailPeminjaman;
 };

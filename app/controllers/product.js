@@ -227,5 +227,28 @@ module.exports = {
         message: err.message || "Some error occurred while retrieving products."
       });
     }
+  },
+
+  async test(req, res) {
+    try {
+      const data = await Product.findAll({
+        include: [
+        //   {
+        //   model: db['category']
+        // },
+        {
+          model: db['brand']
+        },
+        {
+          model: db['product_image']
+        }]
+      });
+      res.status(200).send(data);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({
+        message: err.message || "Some error occurred while retrieving products."
+      });
+    }
   }
 }
