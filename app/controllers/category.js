@@ -8,6 +8,8 @@ module.exports = {
   async findAllPaginate(req, res) {
     try {
       const where = {};
+      const sortColumn = req.query.sort ? req.query.sort : 'createdAt';
+      const sortOrder = req.query.order ? req.query.order : 'DESC';
 
       if(req.query.name) {
         where.name = {
@@ -20,6 +22,9 @@ module.exports = {
 
       const data = await Category.findAndCountAll({
         where: where,
+        order: [
+          [sortColumn, sortOrder]
+        ],
         limit: perPage,
         offset: (currentPage - 1)*perPage,
       });
@@ -52,6 +57,9 @@ module.exports = {
   async findAll(req, res) {
     try {
       const where = {};
+      const sortColumn = req.query.sort ? req.query.sort : 'createdAt';
+      const sortOrder = req.query.order ? req.query.order : 'DESC';
+      const limit = req.query.limit ? Number(req.query.limit) : undefined;
 
       if(req.query.name) {
         where.name = {
@@ -60,7 +68,11 @@ module.exports = {
       }
 
       const data = await Category.findAll({
-        where: where
+        where: where,
+        limit, 
+        order: [
+          [sortColumn, sortOrder]
+        ]
       });
 
       res.json(data);
@@ -87,9 +99,11 @@ module.exports = {
     try {
       const data = await Category.create(req.body);
       const { image_url } = req.files;
-      let url = "category-images/" + data.id + path.extname(image_url.name);
-      await imageService.uploadImage("../../public/"+url, req.files);
-      await data.update({ image_url: image_url });
+      if( image_url ){
+        let url = "category-images/" + data.id + path.extname(image_url.name);
+        await imageService.uploadImage("../../public/"+url, req.files);
+        await data.update({ image_url: image_url });
+      }
       res.json(data);
     } catch (error) {
       res.status(500).send({

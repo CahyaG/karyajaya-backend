@@ -7,6 +7,8 @@ module.exports = {
   async findAllPaginate(req, res) {
     try {
       const where = {};
+      const sortColumn = req.query.sort ? req.query.sort : 'createdAt';
+      const sortOrder = req.query.order ? req.query.order : 'DESC';
 
       if(req.query.name) {
         where.name = {
@@ -17,8 +19,11 @@ module.exports = {
       let currentPage = req.params.page ? Number(req.params.page) : 1
       let perPage = req.query.perPage ? Number(req.query.perPage) : 10
 
-      const data = await Product.findAndCountAll({
+      const data = await Jasa.findAndCountAll({
         where: where,
+        order: [
+          [sortColumn, sortOrder]
+        ],
         limit: perPage,
         offset: (currentPage - 1)*perPage,
       });
@@ -51,6 +56,9 @@ module.exports = {
   async findAll(req, res) {
     try {
       const where = {};
+      const sortColumn = req.query.sort ? req.query.sort : 'createdAt';
+      const sortOrder = req.query.order ? req.query.order : 'DESC';
+      const limit = req.query.limit ? Number(req.query.limit) : undefined;
 
       if(req.query.name) {
         where.name = {
@@ -59,7 +67,11 @@ module.exports = {
       }
 
       const data = await Jasa.findAll({
-        where: where
+        where: where,
+        limit,
+        order: [
+          [sortColumn, sortOrder]
+        ]
       });
 
       res.json(data);

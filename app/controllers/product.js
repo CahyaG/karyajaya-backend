@@ -10,6 +10,8 @@ module.exports = {
       const whereProduct = {};
       const whereCategory = {};
       const whereBrand = {};
+      const sortColumn = req.query.sort ? req.query.sort : 'createdAt';
+      const sortOrder = req.query.order ? req.query.order : 'DESC';
 
       if(req.query.name) {
         whereProduct.name = {
@@ -42,6 +44,9 @@ module.exports = {
           where: whereBrand
         }],
         where: whereProduct,
+        order: [
+          [sortColumn, sortOrder]
+        ],
         limit: perPage,
         offset: (currentPage - 1)*perPage,
       });
@@ -76,6 +81,9 @@ module.exports = {
       const whereProduct = {};
       const whereCategory = {};
       const whereBrand = {};
+      const sortColumn = req.query.sort ? req.query.sort : 'createdAt';
+      const sortOrder = req.query.order ? req.query.order : 'DESC';
+      const limit = req.query.limit ? Number(req.query.limit) : undefined;
 
       if(req.query.name) {
         whereProduct.name = {
@@ -104,7 +112,11 @@ module.exports = {
           model: db['brand'],
           where: whereBrand
         }],
-        where: whereProduct
+        where: whereProduct,
+        limit, 
+        order: [
+          [sortColumn, sortOrder]
+        ]
       });
 
       res.status(200).send(products);
@@ -233,9 +245,9 @@ module.exports = {
     try {
       const data = await Product.findAll({
         include: [
-        //   {
-        //   model: db['category']
-        // },
+        {
+          model: db['category']
+        },
         {
           model: db['brand']
         },
