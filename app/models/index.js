@@ -2,7 +2,6 @@ const dbConfig = require("../configs/database.js");
 let fs = require("fs");
 let path = require("path");
 let basename = path.basename(module.filename);
-console.log(process.env.DB);
 
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {

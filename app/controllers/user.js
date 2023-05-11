@@ -8,7 +8,7 @@ module.exports = {
     const { name, username, email, password, confirmPassword } = req.body;
 
     if (password !== confirmPassword) {
-      res.status(400).send({
+      return res.status(400).send({
         message: "Password and confirm password do not match."
       });
     }
@@ -45,7 +45,7 @@ module.exports = {
       const match = await bcrypt.compare(req.body.password, user[0].password);
 
       if (!match) {
-        res.status(400).send({
+        return res.status(400).send({
           message: "Wrong password."
         });
       }
@@ -57,7 +57,7 @@ module.exports = {
       const accessToken = jwt.sign({
         userId, username, name, email
       }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: '60s'
+        expiresIn: '1d'
       });
       const refreshToken = jwt.sign({
         userId, username, name, email
@@ -90,7 +90,7 @@ module.exports = {
   async logout(req, res) {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      res.sendStatus(204);
+      return res.sendStatus(204);
     }
 
     const user = await User.findAll({
@@ -100,7 +100,7 @@ module.exports = {
     });
 
     if (!user[0]) {
-      res.sendStatus(204);
+      return res.sendStatus(204);
     }
 
     const userId = user[0].id;

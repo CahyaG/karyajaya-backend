@@ -41,17 +41,17 @@ router.delete('/penjualan/:id', verifyToken.verifyToken, penjualan.delete);
 router.put('/penjualan/:id', verifyToken.verifyToken, penjualan.update);
 
 // // AUTH ROUTES
-// router.post('/login', user.login);
-// router.post('/register', user.register);
-// router.delete('/logout', user.logout);
-// router.get('/token', refreshToken.refreshToken);
+router.post('/login', user.login);
+router.post('/register', user.register);
+router.delete('/logout', user.logout);
+router.get('/token', refreshToken.refreshToken);
 
 // PEMINJAMAN ROUTES (need auth)
-// router.get('/peminjaman', peminjaman.findAll);
-// router.get('/peminjaman/:id', peminjaman.findOne);
-// router.post('/peminjaman', verifyToken.verifyToken, peminjaman.create);
-// router.delete('/peminjaman/:id', verifyToken.verifyToken, peminjaman.delete);
-// router.put('/peminjaman/:id', verifyToken.verifyToken, peminjaman.update);
+router.get('/peminjaman', peminjaman.findAll);
+router.get('/peminjaman/:id', peminjaman.findOne);
+router.post('/peminjaman', verifyToken.verifyToken, peminjaman.create);
+router.delete('/peminjaman/:id', verifyToken.verifyToken, peminjaman.delete);
+router.put('/peminjaman/:id', verifyToken.verifyToken, peminjaman.update);
 
 router.get('/test', product.test);
 

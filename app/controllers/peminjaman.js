@@ -55,7 +55,7 @@ module.exports = {
     try {
       const data = await Peminjaman.create(req.body);
       const peminjaman = await Peminjaman.findAll({
-        order: [["createdAt", "DESC"]]
+        order: [["created_at", "DESC"]]
       });
 
       const date = new Date();
@@ -99,7 +99,7 @@ module.exports = {
 
   async delete(req, res) {
     try {
-      const force = req.query.force;
+      const force = req.query.force ? req.query.force : false;
       const data = await Peminjaman.findByPk(req.params.id);
       await DetailPeminjaman.destroy({
         where: {
@@ -122,7 +122,7 @@ module.exports = {
   async findAllPaginate(req, res) {
     try {
       const where = {};
-      const sortColumn = req.query.sort ? req.query.sort : 'createdAt';
+      const sortColumn = req.query.sort ? req.query.sort : 'created_at';
       const sortOrder = req.query.order ? req.query.order : 'DESC';
 
       if (req.query.kode_peminjaman) {

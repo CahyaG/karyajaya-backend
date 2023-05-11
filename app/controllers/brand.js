@@ -8,7 +8,7 @@ module.exports = {
   async findAllPaginate(req, res) {
     try {
       const where = {};
-      const sortColumn = req.query.sort ? req.query.sort : 'createdAt';
+      const sortColumn = req.query.sort ? req.query.sort : 'created_at';
       const sortOrder = req.query.order ? req.query.order : 'DESC';
 
       if (req.query.name) {
@@ -36,7 +36,7 @@ module.exports = {
 
       let brand = {
         content: data.rows,
-        pagginate: {
+        paginate: {
           total,
           currentPage,
           lastPage,
@@ -57,7 +57,7 @@ module.exports = {
   async findAll(req, res) {
     try {
       const where = {};
-      const sortColumn = req.query.sort ? req.query.sort : 'createdAt';
+      const sortColumn = req.query.sort ? req.query.sort : 'created_at';
       const sortOrder = req.query.order ? req.query.order : 'DESC';
       const limit = req.query.limit ? Number(req.query.limit) : undefined;
 
@@ -98,10 +98,10 @@ module.exports = {
   async create(req, res) {
     try {
       const data = await Brand.create(req.body);
-      const { image } = req.files;
+      const { image } = req.files || {};
       if(image){
-        let image_url = "brand-images/" + data.id + path.extname(image.name);
-        await imageService.uploadImage("../../public/" + image_url, req.files);
+        let image_url = "brand-images/" + imageService.makeid() + data.id + path.extname(image.name);
+        await imageService.uploadImage(path.join(publicUrl, image_url), image);
         await data.update({ image_url: image_url });
       }
       res.json(data);
@@ -114,14 +114,19 @@ module.exports = {
 
   async update(req, res) {
     try {
-      const data = await Brand.update(req.body, {
-        where: { id: req.params.id }
-      });
-      const { image_url } = req.files;
-      if(image_url){
-        await imageService.uploadImage("../../public/"+data.image_url, req.files);
+      const brand = await Brand.findByPk(req.params.id);
+
+      let image_url = brand.image_url;
+      const { image } = req.files || {};
+      if(image){
+        await imageService.deleteImage(path.join(publicUrl, brand.image_url));
+        image_url = "brand-images/" + imageService.makeid() + brand.id + path.extname(image.name);
+        await imageService.uploadImage(path.join(publicUrl, brand.image_url), image);
       }
-      res.json(data);
+
+      const updatedBrand = await brand.update({...req.body, image_url: image_url});
+
+      res.json(updatedBrand);
     } catch (error) {
       res.status(500).send({
         message: error.message || "Some error occurred while updating the Brand."
@@ -131,11 +136,11 @@ module.exports = {
 
   async delete(req, res) {
     try {
-      const force = req.query.force;
+      const force = req.query.force ? req.query.force : false;
       const data = await Brand.findByPk(req.params.id);
-      if(force)
-        await imageService.deleteImage("../../public/"+data.image_url);
-      const deletedBrand = await Brand.destroy({force});
+      if(force && data.image_url)
+        await imageService.deleteImage(path.join(publicUrl, data.image_url));
+      const deletedBrand = await data.destroy({force});
       res.json(deletedBrand);
     } catch (error) {
       res.status(500).send({

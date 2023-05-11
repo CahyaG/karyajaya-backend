@@ -15,12 +15,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
     },
-    createdAt: { type: DataTypes.DATE, field: 'created_at' },
-    updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
-    deletedAt: { type: DataTypes.DATE, field: 'deleted_at' },
   }, {
     paranoid: true,
     tableName: 'penjualan',
+    createdAt : 'created_at',
+    updatedAt : 'updated_at',
+    deletedAt : 'deleted_at',
     defaultScope: {
       attributes: {
         exclude: ['createdAt', 'updatedAt', 'deletedAt']

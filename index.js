@@ -3,6 +3,8 @@ const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
 const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
+var path = require('path');
+global.publicUrl = path.join(__dirname, 'public/');
 
 dotenv.config();
 const app = express();

@@ -11,12 +11,12 @@ module.exports = (sequelize, DataTypes) => {
     peminjaman_id: {
       type: DataTypes.BIGINT
     },
-    createdAt: { type: DataTypes.DATE, field: 'created_at' },
-    updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
-    deletedAt: { type: DataTypes.DATE, field: 'deleted_at' },
   }, {
     paranoid: true,
     tableName: 'detail_peminjaman',
+    createdAt : 'created_at',
+    updatedAt : 'updated_at',
+    deletedAt : 'deleted_at',
     defaultScope: {
       attributes: {
         exclude: ['createdAt', 'updatedAt', 'deletedAt']
