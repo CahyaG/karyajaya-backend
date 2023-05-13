@@ -30,6 +30,10 @@ module.exports = {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
       counter += 1;
     }
-    return result;
+    return 'a';
+  },
+
+  makeUrl(publicPath, id, ext){
+    return `${publicPath}/${this.makeid()}${id}${ext}`;
   }
 }

@@ -100,7 +100,7 @@ module.exports = {
       const data = await Brand.create(req.body);
       const { image } = req.files || {};
       if(image){
-        let image_url = "brand-images/" + imageService.makeid() + data.id + path.extname(image.name);
+        image_url = imageService.makeUrl("brand-images", data.id, path.extname(image.name));
         await imageService.uploadImage(path.join(publicUrl, image_url), image);
         await data.update({ image_url: image_url });
       }
@@ -120,7 +120,7 @@ module.exports = {
       const { image } = req.files || {};
       if(image){
         await imageService.deleteImage(path.join(publicUrl, brand.image_url));
-        image_url = "brand-images/" + imageService.makeid() + brand.id + path.extname(image.name);
+        image_url = imageService.makeUrl("brand-images", brand.id, path.extname(image.name));
         await imageService.uploadImage(path.join(publicUrl, brand.image_url), image);
       }
 
