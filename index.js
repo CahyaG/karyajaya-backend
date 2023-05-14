@@ -3,11 +3,14 @@ const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
 const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
-var path = require('path');
+const path = require('path');
+const cors = require('cors')
+
 global.publicUrl = path.join(__dirname, 'public/');
 
 dotenv.config();
 const app = express();
+app.use(cors())
 
 const db = require("./app/models");
 db.sequelize.sync()

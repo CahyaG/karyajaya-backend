@@ -38,7 +38,7 @@ module.exports = {
     try {
       const user = await User.findAll({
         where: {
-          username: req.body.username
+          email: req.body.email
         }
       });
 
@@ -112,5 +112,9 @@ module.exports = {
 
     res.clearCookie("refreshToken");
     res.sendStatus(200);
+  },
+
+  async verifyUser(req, res) {
+    return res.send({"message": "User is verified."});
   }
 };

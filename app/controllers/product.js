@@ -2,6 +2,7 @@ const db = require("../models");
 const Product = db['product'];
 const ProductImage = db['product_image'];
 const imageService = require('../services/image.js');
+const utils = require('../services/utils.js');
 const Op = db.Sequelize.Op;
 const path = require('path');
 
@@ -155,7 +156,8 @@ module.exports = {
       const { cover, product_images } = req.files || {};
       let image_url = imageService.makeUrl("product-images", data.id, path.extname(cover.name));
       await imageService.uploadImage(path.join(publicUrl, image_url), cover);
-      await data.update({ cover: image_url });
+      let code = `P${utils.generateCode()}${data.id}`;
+      await data.update({ cover: image_url, product_code: code });
 
       if(product_images){
         product_images.forEach(async (product_image) => {

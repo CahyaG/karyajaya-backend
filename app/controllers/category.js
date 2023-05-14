@@ -1,5 +1,6 @@
 const db = require("../models");
 const Category = db['category'];
+const utils = require('../services/utils.js');
 const imageService = require('../services/image.js');
 const path = require('path')
 const Op = db.Sequelize.Op;
@@ -98,6 +99,8 @@ module.exports = {
   async create(req, res) {
     try {
       const data = await Category.create(req.body);
+      let code = `C${utils.generateCode()}${data.id}`;
+      await data.update({ category_code: code });
       const { image } = req.files || {};
       if( image ){
         let url = imageService.makeUrl("category-images", data.id, path.extname(image.name));
