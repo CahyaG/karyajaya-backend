@@ -104,7 +104,7 @@ module.exports = {
       const data = await Jasa.create(req.body);
       
       const { cover } = req.files || {};
-      let image_url = "jasa-images/" + imageService.makeid() +  data.id + path.extname(cover.name);
+      let image_url = imageService.makeUrl("jasa-images", data.id, path.extname(cover.name));
       await imageService.uploadImage(path.join(publicUrl, image_url), cover);
       await data.update({ cover: image_url });
       res.json(data);
@@ -123,7 +123,7 @@ module.exports = {
       const { cover } = req.files || {};
       if(cover){
         await imageService.deleteImage(path.join(publicUrl, jasa.cover));
-        cover_url = "jasa-images/" + imageService.makeid() + jasa.id + path.extname(cover.name);
+        cover_url = imageService.makeUrl("jasa-images", jasa.id, path.extname(cover.name));
         await imageService.uploadImage(path.join(publicUrl, data.cover), cover);
       }
       const updatedJasa = await jasa.update({...req.body, cover: cover_url});

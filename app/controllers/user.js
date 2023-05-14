@@ -112,5 +112,9 @@ module.exports = {
 
     res.clearCookie("refreshToken");
     res.sendStatus(200);
+  },
+
+  async verifyUser(req, res) {
+    return res.send({"message": "User is verified."});
   }
 };

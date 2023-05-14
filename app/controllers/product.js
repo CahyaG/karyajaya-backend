@@ -2,6 +2,7 @@ const db = require("../models");
 const Product = db['product'];
 const ProductImage = db['product_image'];
 const imageService = require('../services/image.js');
+const utils = require('../services/utils.js');
 const Op = db.Sequelize.Op;
 const path = require('path');
 
@@ -153,14 +154,15 @@ module.exports = {
     try {
       const data = await Product.create(req.body);
       const { cover, product_images } = req.files || {};
-      let image_url = "product-images/" + imageService.makeid() + data.id + path.extname(cover.name);
+      let image_url = imageService.makeUrl("product-images", data.id, path.extname(cover.name));
       await imageService.uploadImage(path.join(publicUrl, image_url), cover);
-      await data.update({ cover: image_url });
+      let code = `P${utils.generateCode()}${data.id}`;
+      await data.update({ cover: image_url, product_code: code });
 
       if(product_images){
         product_images.forEach(async (product_image) => {
           const productImage = await ProductImage.create({ product_id: data.id});
-          let image_url = "product-images/detail-images/" + imageService.makeid() + productImage.id + path.extname(product_image.name);
+          image_url = imageService.makeUrl("product-images/detail-images", productImage.id, path.extname(product_image.name));
           await imageService.uploadImage(path.join(publicUrl, image_url), product_image);
           await productImage.update({ image_url: image_url });
         });
@@ -180,7 +182,7 @@ module.exports = {
       let cover_url = product.cover;
       if(cover){
         await imageService.deleteImage(path.join(publicUrl, product.cover));
-        cover_url = "product-images/" + imageService.makeid() + product.id + path.extname(cover.name);
+        cover_url = imageService.makeUrl("product-images", product.id, path.extname(cover.name));
         await imageService.uploadImage(path.join(publicUrl, cover_url), cover);
       }
       const updatedProduct = await product.update({ ...req.body, cover: cover_url });
@@ -235,7 +237,7 @@ module.exports = {
     try {
       const data = await ProductImage.create(req.body);
       const { image } = req.files;
-      let image_url = "product-images/detail-images/" + imageService.makeid() + data.id + path.extname(image.name);
+      let image_url = imageService.makeUrl("product-images/detail-images", data.id, path.extname(image.name));
       await imageService.uploadImage(path.join(publicUrl, image_url), req.files);
       await data.update({ image_url });
       res.status(200).send(data);
@@ -249,7 +251,7 @@ module.exports = {
   async test(req, res) {
     try {
       await imageService.deleteImage(path.join(publicUrl, "product-images/41.jpg"));
-      res.status(200).send("data");
+      res.status(200).send("http://localhost:8080/product-images/41.jpg");
     } catch (err) {
       console.log(err);
       res.status(500).send({

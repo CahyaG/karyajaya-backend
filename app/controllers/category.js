@@ -1,5 +1,6 @@
 const db = require("../models");
 const Category = db['category'];
+const utils = require('../services/utils.js');
 const imageService = require('../services/image.js');
 const path = require('path')
 const Op = db.Sequelize.Op;
@@ -98,9 +99,11 @@ module.exports = {
   async create(req, res) {
     try {
       const data = await Category.create(req.body);
+      let code = `C${utils.generateCode()}${data.id}`;
+      await data.update({ category_code: code });
       const { image } = req.files || {};
       if( image ){
-        let url = "category-images/" + imageService.makeid() + data.id + path.extname(image.name);
+        let url = imageService.makeUrl("category-images", data.id, path.extname(image.name));
         await imageService.uploadImage(path.join(publicUrl, url), image);
         await data.update({ image_url: url });
       }
@@ -120,7 +123,7 @@ module.exports = {
       const { image } = req.files || {};
       if(image){
         await imageService.deleteImage(path.join(publicUrl, category.image_url));
-        image_url = "category-images/" + imageService.makeid() + category.id + path.extname(image.name);
+        image_url = imageService.makeUrl("category-images", category.id, path.extname(image.name));
         await imageService.uploadImage(path.join(publicUrl, category.image_url), image_url);
       }
       

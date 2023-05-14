@@ -54,6 +54,8 @@ router.post('/peminjaman', verifyToken.verifyToken, peminjaman.create);
 router.delete('/peminjaman/:id', verifyToken.verifyToken, peminjaman.delete);
 router.put('/peminjaman/:id', verifyToken.verifyToken, peminjaman.update);
 
+router.get('/verify', verifyToken.verifyToken, user.verifyUser);
+
 router.get('/test', product.test);
 
 module.exports = router;
