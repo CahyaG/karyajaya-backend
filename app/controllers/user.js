@@ -38,7 +38,7 @@ module.exports = {
     try {
       const user = await User.findAll({
         where: {
-          username: req.body.username
+          email: req.body.email
         }
       });
 
