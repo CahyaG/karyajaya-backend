@@ -39,9 +39,9 @@ module.exports = {
         ],
         // group: ['Penjualan.id']
       });
-      if(!data[0].id){
-        return res.json([])
-      }
+      // if(!data[0].id){
+      //   return res.json([])
+      // }
 
       res.json(data);
     } catch (error) {
