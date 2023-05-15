@@ -2,7 +2,9 @@ const db = require("../models");
 const Product = db['product'];
 const ProductImage = db['product_image'];
 const imageService = require('../services/image.js');
+const utils = require('../services/utils.js');
 const Op = db.Sequelize.Op;
+const path = require('path');
 
 module.exports = {
   async findAllPaginate(req, res) {
@@ -10,6 +12,8 @@ module.exports = {
       const whereProduct = {};
       const whereCategory = {};
       const whereBrand = {};
+      const sortColumn = req.query.sort ? req.query.sort : 'created_at';
+      const sortOrder = req.query.order ? req.query.order : 'DESC';
 
       if(req.query.name) {
         whereProduct.name = {
@@ -42,6 +46,9 @@ module.exports = {
           where: whereBrand
         }],
         where: whereProduct,
+        order: [
+          [sortColumn, sortOrder]
+        ],
         limit: perPage,
         offset: (currentPage - 1)*perPage,
       });
@@ -53,7 +60,7 @@ module.exports = {
 
       let products = {
         content: data.rows,
-        pagginate:{
+        paginate:{
             total,
             currentPage,
             lastPage,
@@ -76,6 +83,9 @@ module.exports = {
       const whereProduct = {};
       const whereCategory = {};
       const whereBrand = {};
+      const sortColumn = req.query.sort ? req.query.sort : 'created_at';
+      const sortOrder = req.query.order ? req.query.order : 'DESC';
+      const limit = req.query.limit ? Number(req.query.limit) : undefined;
 
       if(req.query.name) {
         whereProduct.name = {
@@ -104,7 +114,11 @@ module.exports = {
           model: db['brand'],
           where: whereBrand
         }],
-        where: whereProduct
+        where: whereProduct,
+        limit, 
+        order: [
+          [sortColumn, sortOrder]
+        ]
       });
 
       res.status(200).send(products);
@@ -139,16 +153,17 @@ module.exports = {
   async create(req, res) {
     try {
       const data = await Product.create(req.body);
-      const { cover, product_images } = req.files;
-      let image_url = "product-images/" + data.id + path.extname(cover.name);
-      await imageService.uploadImage("../../public/"+image_url, req.files);
-      await data.update({ cover: image_url });
+      const { cover, product_images } = req.files || {};
+      let image_url = imageService.makeUrl("product-images", data.id, path.extname(cover.name));
+      await imageService.uploadImage(path.join(publicUrl, image_url), cover);
+      let code = `P${utils.generateCode()}${data.id}`;
+      await data.update({ cover: image_url, product_code: code });
 
       if(product_images){
         product_images.forEach(async (product_image) => {
           const productImage = await ProductImage.create({ product_id: data.id});
-          let image_url = "product-images/" + productImage.id + path.extname(product_image.name);
-          await imageService.uploadImage("../../public/"+image_url, req.files);
+          image_url = imageService.makeUrl("product-images/detail-images", productImage.id, path.extname(product_image.name));
+          await imageService.uploadImage(path.join(publicUrl, image_url), product_image);
           await productImage.update({ image_url: image_url });
         });
       }
@@ -163,12 +178,16 @@ module.exports = {
   async update(req, res) { 
     try {
       const product = await Product.findByPk(req.params.id);
-      const { cover, product_images } = req.files;
-      let image_url = "jasa-images/" + data.id + path.extname(cover.name);
-      await imageService.uploadImage("../../public/"+image_url, req.files);
-      const updatedProduct = await product.update({ ...req.body, cover: image_url });
+      const { cover } = req.files || {};
+      let cover_url = product.cover;
+      if(cover){
+        await imageService.deleteImage(path.join(publicUrl, product.cover));
+        cover_url = imageService.makeUrl("product-images", product.id, path.extname(cover.name));
+        await imageService.uploadImage(path.join(publicUrl, cover_url), cover);
+      }
+      const updatedProduct = await product.update({ ...req.body, cover: cover_url });
       res.status(200).send(updatedProduct);
-    } catch (err) {s
+    } catch (err) {
       res.status(500).send({
         message: err.message || "Some error occurred while retrieving products."
       });
@@ -177,7 +196,7 @@ module.exports = {
 
   async delete(req, res) {
     try {
-      const force = req.query.force;
+      const force = req.query.force ? req.query.force : false;
       const product = await Product.findByPk(req.params.id);
       const productImages = await ProductImage.findAll({
         where: {
@@ -186,8 +205,8 @@ module.exports = {
       });
       productImages.forEach(async (productImage) => {
         if(force)
-          await imageService.deleteImage("../../public/images/"+productImage.image_url);
-        await productImage.destroy({force});
+          await imageService.deleteImage(path.join(publicUrl, productImage.image_url));
+        await productImage.destroy();
       });
 
       const deletedProduct = await product.destroy({force});
@@ -201,10 +220,10 @@ module.exports = {
 
   async deleteImage(req, res) {
     try {
-      const force = req.query.force;
+      const force = req.query.force ? req.query.force : false;
       const productImage = await ProductImage.findByPk(req.params.id);
       if(force)
-        await imageService.deleteImage("../../public/images/"+productImage.image_url);
+        await imageService.deleteImage(path.join(publicUrl, productImage.image_url));
       const deletedProductImage = await productImage.destroy({force});
       res.status(200).send(deletedProductImage);
     } catch (err) {
@@ -218,11 +237,23 @@ module.exports = {
     try {
       const data = await ProductImage.create(req.body);
       const { image } = req.files;
-      let image_url = "jasa-images/" + data.id + path.extname(image.name);
-      await imageService.uploadImage("../../public/"+image_url, req.files);
+      let image_url = imageService.makeUrl("product-images/detail-images", data.id, path.extname(image.name));
+      await imageService.uploadImage(path.join(publicUrl, image_url), req.files);
       await data.update({ image_url });
       res.status(200).send(data);
     } catch (err) {
+      res.status(500).send({
+        message: err.message || "Some error occurred while retrieving products."
+      });
+    }
+  },
+
+  async test(req, res) {
+    try {
+      await imageService.deleteImage(path.join(publicUrl, "product-images/41.jpg"));
+      res.status(200).send("http://localhost:8080/product-images/41.jpg");
+    } catch (err) {
+      console.log(err);
       res.status(500).send({
         message: err.message || "Some error occurred while retrieving products."
       });

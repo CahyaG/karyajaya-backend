@@ -3,8 +3,14 @@ const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
 const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
+const path = require('path');
+const cors = require('cors')
+
+global.publicUrl = path.join(__dirname, 'public/');
+
 dotenv.config();
 const app = express();
+app.use(cors())
 
 const db = require("./app/models");
 db.sequelize.sync()
@@ -12,7 +18,7 @@ db.sequelize.sync()
     console.log("Synced db.");
   })
   .catch((err) => {
-    console.log("Failed to sync db: " + err.message);
+    console.log("Failed to sync db: " + err);
   });
 
 app.use(cookieParser());

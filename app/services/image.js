@@ -1,4 +1,5 @@
 const fs = require('fs');
+const utils = require('./utils.js');
 
 module.exports = {
   async uploadImage (path, image){
@@ -19,5 +20,9 @@ module.exports = {
       }
       return true
     });
+  },
+
+  makeUrl(publicPath, id, ext){
+    return `${publicPath}/${utils.makeid()}${id}${ext}`;
   }
 }

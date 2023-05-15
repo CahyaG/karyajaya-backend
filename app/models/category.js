@@ -1,5 +1,10 @@
 module.exports = (sequelize, DataTypes) => {
   const Category = sequelize.define("category", {
+    id: {
+      type: DataTypes.BIGINT,
+      primaryKey: true,
+      autoIncrement: true
+    },
     category_code: {
       type: DataTypes.STRING
     },
@@ -11,13 +16,14 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: null
     },
-    createdAt: { type: DataTypes.DATE, field: 'created_at' },
-    updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
   }, {
     paranoid: true,
+    createdAt : 'created_at',
+    updatedAt : 'updated_at',
+    deletedAt : 'deleted_at',
     defaultScope: {
       attributes: { 
-        exclude: ['createdAt','updatedAt'] 
+        exclude: ['createdAt','updatedAt', 'deletedAt'] 
       },
     },
 

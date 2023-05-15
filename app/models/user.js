@@ -1,5 +1,10 @@
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define("user", {
+    id: {
+      type: DataTypes.BIGINT,
+      primaryKey: true,
+      autoIncrement: true
+    },
     name: {
       type: DataTypes.STRING
     },
@@ -15,13 +20,14 @@ module.exports = (sequelize, DataTypes) => {
     refresh_token: {
       type: DataTypes.STRING
     },
-    createdAt: { type: DataTypes.DATE, field: 'created_at' },
-    updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
   }, {
     paranoid: true,
+    createdAt : 'created_at',
+    updatedAt : 'updated_at',
+    deletedAt : 'deleted_at',
     defaultScope: {
       attributes: {
-        exclude: ['createdAt', 'updatedAt']
+        exclude: ['createdAt', 'updatedAt', 'deletedAt']
       },
     },
 

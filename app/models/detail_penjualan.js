@@ -1,21 +1,33 @@
 module.exports = (sequelize, DataTypes) => {
   const DetailPenjualan = sequelize.define("detail_penjualan", {
-    createdAt: { type: DataTypes.DATE, field: 'created_at' },
-    updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
+    id: {
+      type: DataTypes.BIGINT,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    product_id: {
+      type: DataTypes.BIGINT
+    },
+    penjualan_id: {
+      type: DataTypes.BIGINT
+    },
   }, {
     paranoid: true,
     tableName: 'detail_penjualan',
+    createdAt : 'created_at',
+    updatedAt : 'updated_at',
+    deletedAt : 'deleted_at',
     defaultScope: {
       attributes: {
-        exclude: ['createdAt', 'updatedAt']
+        exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId']
       },
     },
 
   });
 
   DetailPenjualan.associate = function (models) {
-    this.BelongsTo(models.product, { foreignKey: 'product_id' });
-    this.BelongsTo(models.penjualan, { foreignKey: 'penjualan_id' });
+    this.belongsTo(models.product, { foreignKey: 'product_id' });
+    this.belongsTo(models.penjualan, { foreignKey: 'penjualan_id' });
   };
 
   return DetailPenjualan;

@@ -1,17 +1,26 @@
 module.exports = (sequelize, DataTypes) => {
   const ProductImage = sequelize.define("product_image", {
+    id: {
+      type: DataTypes.BIGINT,
+      primaryKey: true,
+      autoIncrement: true
+    },
     image_url: {
       type: DataTypes.STRING,
       allowNull: true,
       defaultValue: null
     },
-    createdAt: { type: DataTypes.DATE, field: 'created_at' },
-    updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
+    product_id: {
+      type: DataTypes.BIGINT
+    },
   }, {
     paranoid: true,
+    createdAt : 'created_at',
+    updatedAt : 'updated_at',
+    deletedAt : 'deleted_at',
     defaultScope: {
       attributes: { 
-        exclude: ['createdAt','updatedAt'] 
+        exclude: ['createdAt','updatedAt', 'deletedAt'] 
       },
     },
 
