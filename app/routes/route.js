@@ -11,7 +11,7 @@ router.post('/products', verifyToken.verifyToken, product.create);
 router.delete('/products/:id', verifyToken.verifyToken, product.delete);
 router.put('/products/:id', verifyToken.verifyToken, product.update);
 router.post('/products/:id/images', verifyToken.verifyToken, product.createImage);
-router.delete('/products/:id/images/:image_id', verifyToken.verifyToken, product.deleteImage);
+router.delete('/products/:product_id/images/:id', verifyToken.verifyToken, product.deleteImage);
 
 // CATEGORY ROUTES
 router.get('/categories', category.findAll);

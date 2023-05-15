@@ -22,18 +22,26 @@ module.exports = {
       const data = await Penjualan.findAll({
         attributes: [
           'id','kode_penjualan', 'tanggal_penjualan', 'total_harga',
-          [db.sequelize.fn('COUNT', db.sequelize.col('detail_penjualans.id')), 'total_barang']
+          // [db.sequelize.fn('COUNT', db.sequelize.col('detail_penjualans.id')), 'total_barang']
         ],
         include: [{
           model: DetailPenjualan,
-          attributes: []
+          attributes: ['id'],
+          include: [{
+            model: Product,
+            attributes: ['product_code', 'name']
+          }]
         }],
         where: where,
         limit,
         order: [
           [sortColumn, sortOrder]
         ],
+        // group: ['Penjualan.id']
       });
+      if(!data[0].id){
+        return res.json([])
+      }
 
       res.json(data);
     } catch (error) {
@@ -48,7 +56,15 @@ module.exports = {
       const data = await Penjualan.findOne({
         where: {
           id: req.params.id
-        }
+        },
+        include: [{
+          model: DetailPenjualan,
+          attributes: ['id'],
+          include: [{
+            model: Product,
+            attributes: ['id', 'product_code', 'name']
+          }]
+        }]
       });
 
       res.json(data);
@@ -67,15 +83,18 @@ module.exports = {
       const data = await Penjualan.create(params);
       const product_id = req.body.product_id;
       let total_price = 0
-      product_id.forEach(async (item) => {
+
+      await Promise.all(product_id.map( async (item) => {
         let detailPenjualan = {
           penjualan_id: data.id,
           product_id: item,
         }
         const product = await Product.findByPk(item);
         total_price += product.price;
+        console.log(total_price)
         DetailPenjualan.create(detailPenjualan);
-      });
+      }))
+      
       let code = `PJ${utils.generateCode()}${data.id}`
       await data.update({
         kode_penjualan: code,
@@ -156,6 +175,7 @@ module.exports = {
         ],
         limit: req.query.perPage,
         offset: (currentPage - 1) * perPage,
+        group: ['Penjualan.id']
       });
 
       let total = data.count;

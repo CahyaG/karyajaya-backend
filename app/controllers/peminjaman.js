@@ -1,6 +1,7 @@
 const db = require("../models");
 const Peminjaman = db["peminjaman"];
 const DetailPeminjaman = db["detail_peminjaman"];
+const Product = db["product"];
 const Op = db.Sequelize.Op;
 
 module.exports = {
@@ -17,14 +18,20 @@ module.exports = {
 
       const data = await Peminjaman.findAll({
         attributes: [
-          'id', 'kode_peminjaman', 'tanggal_keluar', 'tanggal_kembali', 'tanggal_dikembalikan', [db.sequelize.fn('COUNT', db.sequelize.col('detail_peminjamans.id')), 'total_barang']
+          'id', 'kode_peminjaman', 'tanggal_keluar', 'tanggal_kembali', 'tanggal_dikembalikan'
+          // [db.sequelize.fn('COUNT', db.sequelize.col('detail_peminjamans.id')), 'total_barang']
         ],
         include: [{
           model: DetailPeminjaman,
-          attributes: []
+          attributes: ['id'],
+          include: [{
+            model: Product,
+            attributes: ['product_code', 'name']
+          }]
         }],
         where: where,
-        limit
+        limit,
+        // group: ['Peminjaman.id']
       });
 
       res.json(data);
@@ -40,7 +47,15 @@ module.exports = {
       const data = await Peminjaman.findOne({
         where: {
           id: req.params.id
-        }
+        },
+        include: [{
+          model: DetailPeminjaman,
+          attributes: ['id'],
+          include: [{
+            model: Product,
+            attributes: ['product_code', 'name']
+          }]
+        }]
       });
 
       res.json(data);
@@ -69,8 +84,18 @@ module.exports = {
       let code = "LE" + day + month + year + id;
 
       await data.update({
-        code: code
+        kode_peminjaman: code
       });
+
+      const product_id = req.body.product_id;
+      await Promise.all(product_id.map( async (item) => {
+        let detailPeminjaman = {
+          peminjaman_id: data.id,
+          product_id: item,
+        }
+        DetailPeminjaman.create(detailPeminjaman);
+      }))
+
 
       res.json(data);
     } catch (error) {
@@ -88,6 +113,30 @@ module.exports = {
           id: req.params.id
         }
       });
+      // const product_id = req.body.product_id;
+      // await DetailPeminjaman.destroy({
+      //   where: {
+      //     peminjaman_id: req.params.id,
+      //     product_id: {
+      //       [Op.notIn]: product_id
+      //     }
+      //   }}
+      // )
+      // await Promise.all(product_id.map( async (item) => {
+      //   const product = await DetailPeminjaman.findOne({
+      //     where: {
+      //       peminjaman_id: req.params.id,
+      //       product_id: item
+      //     }
+      //   })
+      //   if (!product) {
+      //     let detailPeminjaman = {
+      //       peminjaman_id: req.params.id,
+      //       product_id: item,
+      //     }
+      //     DetailPeminjaman.create(detailPeminjaman);
+      //   }
+      // }))
 
       res.json(data);
     } catch (error) {
@@ -149,6 +198,7 @@ module.exports = {
         ],
         limit: req.query.perPage,
         offset: (currentPage - 1) * perPage,
+        group: ['Peminjaman.id']
       });
 
       let total = data.count;
