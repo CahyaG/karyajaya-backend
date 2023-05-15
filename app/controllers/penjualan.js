@@ -1,7 +1,9 @@
 const db = require("../models");
 const Penjualan = db['penjualan'];
 const DetailPenjualan = db['detail_penjualan'];
+const Product = db['product'];
 const Op = db.Sequelize.Op;
+const utils = require('../services/utils.js');
 
 module.exports = {
   async findAll(req, res) {
@@ -59,7 +61,26 @@ module.exports = {
 
   async create(req, res) {
     try {
-      const data = await Penjualan.create(req.body);
+      let params = {
+        tanggal_penjualan: req.body.tanggal_penjualan
+      }
+      const data = await Penjualan.create(params);
+      const product_id = req.body.product_id;
+      let total_price = 0
+      product_id.forEach(async (item) => {
+        let detailPenjualan = {
+          penjualan_id: data.id,
+          product_id: item,
+        }
+        const product = await Product.findByPk(item);
+        total_price += product.price;
+        DetailPenjualan.create(detailPenjualan);
+      });
+      let code = `PJ${utils.generateCode()}${data.id}`
+      await data.update({
+        kode_penjualan: code,
+        total_harga: total_price
+      });
       
       res.json(data);
     } catch (error) {
