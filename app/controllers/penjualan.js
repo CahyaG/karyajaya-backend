@@ -116,9 +116,36 @@ module.exports = {
           id: req.params.id
         }
       });
+
+      const product_id = req.body.product_id;
+      await DetailPenjualan.destroy({
+        force: true,
+        where: {
+          penjualan_id: req.params.id,
+          product_id: {
+            [Op.notIn]: product_id
+          }
+        }}
+      )
+      await Promise.all(product_id.map( async (item) => {
+        const product = await DetailPenjualan.findOne({
+          where: {
+            penjualan_id: req.params.id,
+            product_id: item
+          }
+        })
+        if (!product) {
+          let detailPenjualan = {
+            penjualan_id: req.params.id,
+            product_id: item,
+          }
+          DetailPenjualan.create(detailPenjualan);
+        }
+      }))
       
       res.json(data);
     } catch (error) {
+      console.log(error)
       res.status(500).send({
         message: error.message || "Some error occurred while updating the Penjualan."
       });

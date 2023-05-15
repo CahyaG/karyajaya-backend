@@ -26,7 +26,7 @@ module.exports = {
           attributes: ['id'],
           include: [{
             model: Product,
-            attributes: ['product_code', 'name']
+            attributes: ['id', 'product_code', 'name']
           }]
         }],
         where: where,
@@ -53,7 +53,7 @@ module.exports = {
           attributes: ['id'],
           include: [{
             model: Product,
-            attributes: ['product_code', 'name']
+            attributes: ['id', 'product_code', 'name']
           }]
         }]
       });
@@ -113,30 +113,31 @@ module.exports = {
           id: req.params.id
         }
       });
-      // const product_id = req.body.product_id;
-      // await DetailPeminjaman.destroy({
-      //   where: {
-      //     peminjaman_id: req.params.id,
-      //     product_id: {
-      //       [Op.notIn]: product_id
-      //     }
-      //   }}
-      // )
-      // await Promise.all(product_id.map( async (item) => {
-      //   const product = await DetailPeminjaman.findOne({
-      //     where: {
-      //       peminjaman_id: req.params.id,
-      //       product_id: item
-      //     }
-      //   })
-      //   if (!product) {
-      //     let detailPeminjaman = {
-      //       peminjaman_id: req.params.id,
-      //       product_id: item,
-      //     }
-      //     DetailPeminjaman.create(detailPeminjaman);
-      //   }
-      // }))
+      const product_id = req.body.product_id;
+      await DetailPeminjaman.destroy({
+        force: true,
+        where: {
+          peminjaman_id: req.params.id,
+          product_id: {
+            [Op.notIn]: product_id
+          }
+        }}
+      )
+      await Promise.all(product_id.map( async (item) => {
+        const product = await DetailPeminjaman.findOne({
+          where: {
+            peminjaman_id: req.params.id,
+            product_id: item
+          }
+        })
+        if (!product) {
+          let detailPeminjaman = {
+            peminjaman_id: req.params.id,
+            product_id: item,
+          }
+          DetailPeminjaman.create(detailPeminjaman);
+        }
+      }))
 
       res.json(data);
     } catch (error) {
