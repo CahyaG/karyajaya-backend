@@ -178,13 +178,23 @@ module.exports = {
   async update(req, res) { 
     try {
       const product = await Product.findByPk(req.params.id);
-      const { cover } = req.files || {};
+      const { cover, product_images } = req.files || {};
       let cover_url = product.cover;
       if(cover){
         await imageService.deleteImage(path.join(publicUrl, product.cover));
         cover_url = imageService.makeUrl("product-images", product.id, path.extname(cover.name));
         await imageService.uploadImage(path.join(publicUrl, cover_url), cover);
       }
+
+      if(product_images){
+        product_images.forEach(async (product_image) => {
+          const productImage = await ProductImage.create({ product_id: product.id});
+          let image_url = imageService.makeUrl("product-images/detail-images", productImage.id, path.extname(product_image.name));
+          await imageService.uploadImage(path.join(publicUrl, image_url), product_image);
+          await productImage.update({ image_url: image_url });
+        });
+      }
+
       const updatedProduct = await product.update({ ...req.body, cover: cover_url });
       res.status(200).send(updatedProduct);
     } catch (err) {
